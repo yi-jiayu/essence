@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="icon" href="favicon.png">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+        integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+  <title>Essence - Gist Viewer</title>
+</head>
+<body>
+<main class="container">
+  <header>
+    <h1>
+      Essence
+      <small class="text-muted">Gist Viewer</small>
+    </h1>
+  </header>
+
+  <div>
+    <form id="my_form">
+      <div class="form-group">
+        <label for="gist_id_or_url_input">Gist ID or URL</label>
+        <input type="text" class="form-control form-control-lg" id="gist_id_or_url_input"
+               placeholder="https://gist.github.com/0123456789abcdef" required pattern="(?:.*/)?([a-f0-9]+)"
+               title="A gist ID, or the last segment of a gist URL, should be a lowercase hexadecimal string.">
+      </div>
+      <button type="submit" class="btn btn-primary" id="lets_go">Get gist</button>
+    </form>
+  </div>
+
+  <div id="card_container"></div>
+
+  <template id="card_template">
+    <div class="card my-3">
+      <div class="card-header"><code></code><a role="button" class="btn btn-info btn-sm float-right">Raw</a></div>
+      <div class="card-body">
+        <pre></pre>
+      </div>
+    </div>
+  </template>
+</main>
+
+<script>
+  function appendFile(title, content, rawURL) {
+    const t = document.querySelector('#card_template');
+    const card = document.importNode(t.content, true);
+
+    card.querySelector('code').textContent = title;
+    card.querySelector('a').href = rawURL;
+    card.querySelector('pre').textContent = content;
+
+    const cardContainer = document.querySelector('#card_container');
+    cardContainer.appendChild(card);
+  }
+
+  function appendError(statusCode, statusText, err) {
+    const t = document.querySelector('#card_template');
+    const card = document.importNode(t.content, true);
+
+    card.querySelector('code').textContent = `${statusCode} ${statusText}`;
+    card.querySelector('a').remove();
+    card.querySelector('pre').textContent = err;
+
+    const cardContainer = document.querySelector('#card_container');
+    cardContainer.appendChild(card);
+  }
+
+  function getGistID(idOrURL) {
+    const regex = /(?:.*\/)?([a-f0-9]+)/;
+    const match = regex.exec(idOrURL);
+
+    return match ? match[1] : null;
+  }
+
+  function displayFile(file) {
+    appendFile(file.filename, file.content, file.raw_url);
+  }
+
+  function displayFiles(gist) {
+    Object.values(gist.files).forEach(displayFile);
+  }
+
+  document.querySelector('#my_form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const input = document.querySelector('#gist_id_or_url_input');
+    const idOrURL = input.value;
+    const gistID = getGistID(idOrURL);
+
+    if (!gistID) {
+      // shouldn't happen because we're using the same regex for form validation
+      console.log('invalid gist ID or URL: ' + idOrURL);
+      return;
+    }
+
+    document.querySelector('#card_container').innerHTML = '';
+
+    const url = `https://api.github.com/gists/${gistID}`;
+    fetch(url)
+        .then(res => {
+          if (res.ok) {
+            return res.json().then(displayFiles);
+          } else {
+            return res.text().then(err => appendError(res.status, res.statusText, err));
+          }
+        })
+        .catch(console.error);
+  });
+</script>
+</body>
+</html>
