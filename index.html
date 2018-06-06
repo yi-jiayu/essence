@@ -112,6 +112,15 @@
     }
   });
 
+  window.addEventListener('hashchange', function () {
+    const gistID = window.location.hash.substr(1);
+    if (gistID) {
+      document.querySelector('#gist_id_or_url_input').value = gistID;
+      document.querySelector('#card_container').innerHTML = '';
+      getGist(gistID);
+    }
+  });
+
   document.querySelector('#my_form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -125,8 +134,7 @@
       return;
     }
 
-    document.querySelector('#card_container').innerHTML = '';
-    getGist(gistID);
+    window.location.hash = gistID;
   });
 </script>
 </body>
