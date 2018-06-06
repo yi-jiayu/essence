@@ -85,6 +85,32 @@
     Object.values(gist.files).forEach(displayFile);
   }
 
+  function getGist(ID) {
+    const url = `https://api.github.com/gists/${ID}`;
+    return fetch(url)
+        .then(res => {
+          if (res.ok) {
+            return res.json()
+                .then(displayFiles)
+                .then(() => {
+                  window.location.hash = ID;
+                });
+          } else {
+            return res.text()
+                .then(err => appendError(res.status, res.statusText, err));
+          }
+        })
+        .catch(console.error);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const gistID = window.location.hash.substr(1);
+    if (gistID) {
+      document.querySelector('#gist_id_or_url_input').value = gistID;
+      getGist(gistID);
+    }
+  });
+
   document.querySelector('#my_form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -99,17 +125,7 @@
     }
 
     document.querySelector('#card_container').innerHTML = '';
-
-    const url = `https://api.github.com/gists/${gistID}`;
-    fetch(url)
-        .then(res => {
-          if (res.ok) {
-            return res.json().then(displayFiles);
-          } else {
-            return res.text().then(err => appendError(res.status, res.statusText, err));
-          }
-        })
-        .catch(console.error);
+    getGist(gistID);
   });
 </script>
 </body>
