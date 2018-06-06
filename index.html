@@ -89,7 +89,7 @@
   }
 
   function getGistID(idOrURL) {
-    const regex = /(?:.*\/)?([a-f0-9]+)/;
+    const regex = /^(?:.*\/)?([a-f0-9]+)$/;
     const match = regex.exec(idOrURL);
 
     return match ? match[1] : null;
