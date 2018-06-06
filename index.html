@@ -13,8 +13,25 @@
   <title>Essence - Gist Viewer</title>
 </head>
 <body>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#">Essence</a>
+    <div class="navbar-collapse">
+      <ul class="navbar-nav mr-auto active">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/yi-jiayu/essence">GitHub</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
 <main class="container">
-  <header>
+  <header class="my-3">
     <h1>
       Essence
       <small class="text-muted">Gist Viewer</small>
@@ -114,10 +131,12 @@
 
   window.addEventListener('hashchange', function () {
     const gistID = window.location.hash.substr(1);
+    document.querySelector('#card_container').innerHTML = '';
     if (gistID) {
       document.querySelector('#gist_id_or_url_input').value = gistID;
-      document.querySelector('#card_container').innerHTML = '';
       getGist(gistID);
+    } else {
+      document.querySelector('#my_form').reset();
     }
   });
 
