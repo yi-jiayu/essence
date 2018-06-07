@@ -56,6 +56,8 @@
     </form>
   </div>
 
+  <div class="my-3 text-muted" id="gist_description"></div>
+
   <div id="card_container"></div>
 
   <template id="card_template">
@@ -123,7 +125,8 @@
     f(file.filename, file.content, file.raw_url);
   }
 
-  function displayFiles(gist) {
+  function displayGist(gist) {
+    document.querySelector('#gist_description').textContent = gist.description;
     Object.values(gist.files).forEach(displayFile);
   }
 
@@ -133,7 +136,7 @@
         .then(res => {
           if (res.ok) {
             return res.json()
-                .then(displayFiles)
+                .then(displayGist)
                 .then(() => {
                   window.location.hash = ID;
                 });
