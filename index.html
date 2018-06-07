@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <link rel="icon" href="favicon.png">
 
+  <link rel="stylesheet" href="primer-markdown.min.css">
+
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
         integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
@@ -60,9 +62,7 @@
     <div class="card my-3">
       <div class="card-header"><code></code><a role="button" class="btn btn-outline-info btn-sm float-right">Raw</a>
       </div>
-      <div class="card-body">
-        <pre></pre>
-      </div>
+      <div class="card-body"></div>
     </div>
   </template>
 </main>
@@ -74,7 +74,26 @@
 
     card.querySelector('code').textContent = title;
     card.querySelector('a').href = rawURL;
-    card.querySelector('pre').textContent = content;
+
+    const pre = document.createElement('pre');
+    pre.textContent = content;
+    card.querySelector('.card-body').appendChild(pre);
+
+    const cardContainer = document.querySelector('#card_container');
+    cardContainer.appendChild(card);
+  }
+
+  function appendMarkdown(title, content, rawURL) {
+    const t = document.querySelector('#card_template');
+    const card = document.importNode(t.content, true);
+
+    card.querySelector('code').textContent = title;
+    card.querySelector('a').href = rawURL;
+
+    const markdownBody = document.createElement('article');
+    markdownBody.className = 'markdown-body';
+    markdownBody.innerHTML = marked(content);
+    card.querySelector('.card-body').appendChild(markdownBody);
 
     const cardContainer = document.querySelector('#card_container');
     cardContainer.appendChild(card);
@@ -100,7 +119,8 @@
   }
 
   function displayFile(file) {
-    appendFile(file.filename, file.content, file.raw_url);
+    const f = (file.language === 'Markdown') ? appendMarkdown : appendFile;
+    f(file.filename, file.content, file.raw_url);
   }
 
   function displayFiles(gist) {
@@ -160,5 +180,8 @@
     window.location.hash = gistID;
   });
 </script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+        integrity="sha384-zYUy6Ftss+y/+muaE/0b5dBa0aTDrNk4/R4uoZC6XRfKjbboUOfpd65+b50usPb7"
+        crossorigin="anonymous"></script>
 </body>
 </html>
