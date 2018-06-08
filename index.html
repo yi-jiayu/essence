@@ -158,6 +158,7 @@
 
   window.addEventListener('hashchange', function () {
     const gistID = window.location.hash.substr(1);
+    document.querySelector('#gist_description').textContent = '';
     document.querySelector('#card_container').innerHTML = '';
     if (gistID) {
       document.querySelector('#gist_id_or_url_input').value = gistID;
