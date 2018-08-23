@@ -94,7 +94,7 @@
 
     const markdownBody = document.createElement('article');
     markdownBody.className = 'markdown-body';
-    markdownBody.innerHTML = marked(content);
+    markdownBody.innerHTML = marked ? marked(content) : content;
     card.querySelector('.card-body').appendChild(markdownBody);
 
     const cardContainer = document.querySelector('#card_container');
